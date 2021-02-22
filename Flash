@@ -1,0 +1,280 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include <time.h>
+#include <allegro5/allegro.h>
+//para dialogos
+#include <allegro5/allegro_native_dialog.h>
+//para formas primitivas(ex: ponto, reta, retangulos, circulos)
+#include <allegro5/allegro_primitives.h>
+//para utilizar fontes
+#include <allegro5/allegro_font.h>
+#include <allegro5/allegro_ttf.h>
+
+//variaveis globais
+int const largura = 640;
+int const altura = 480;
+int const letras_X = 10;
+int const letras_Y = 10;
+
+//estrutura de um circulo
+struct circulo{
+	float x;
+	float y;
+	float vx;
+	float vy;
+	float raio;
+	ALLEGRO_COLOR RGB;
+};
+
+//cria meu flash
+void cria_flash(struct circulo *flash){
+	
+	flash->x = largura/2;
+	flash->y = altura/2;
+	flash->vx = 0;
+	flash->vy = 0;
+	flash->raio = 10;
+	flash->RGB = al_map_rgb(255,255,200);
+}
+
+//cria o inimigo do meu flash
+void cria_reveso(struct circulo *reverso){
+	
+	int sorteio_vx = rand()%10;
+	int sorteio_vy =	rand()%10;
+	reverso->y = rand()%largura;
+	reverso->y = rand()%altura;
+	reverso->RGB = al_map_rgb(50,255,0);
+	if(sorteio_vx>4){
+		reverso->vy = (rand()%10) + 1;
+	}else{
+		reverso->vy = ((rand()%10)+1) *(-1);
+	}
+	if(sorteio_vy>4){
+		reverso->vy = (rand()%10)+1 ;
+	}else{
+		reverso->vy = ((rand()%10)+1) *(-1);
+	}
+}
+
+//cria o circulos que seram usados como comida
+void cria_circulo(struct circulo *criada, i){
+	
+	int sorteio_vx = rand()%10;
+	int sorteio_vy =	rand()%10;
+	criada[i]->x = rand()%largura;
+	criada[i]->y = rand()%altura;
+	criada[i]->raio = rand()%10
+	criada[i]->RGB = al_map_rgb((rand()%150),(rand()%150),(rand()%150)); //cor gerada aleatoria entre vermelho, verde e azul
+	if(sorteio_vx>4){
+		criada[i]->vy = (rand()%10) + 1;
+	}else{
+		criada[i]->vy = ((rand()%10)+1) *(-1);
+	}
+	if(sorteio_vy>4){
+		criada[i]->vy = (rand()%10)+1 ;
+	}else{
+		criada[i]->vy = ((rand()%10)+1) *(-1);
+	}
+}
+
+//o circulo com maor reai entre as duas comidas que se tocam cresce o tamanho da area da outra
+void colisao_comida(struct circulo *comidaA, struct circulo *comidaB, int i,int j){
+	if(comidaA[i]->raio > comida->raio){
+		if(((comidaA[i]->x + comidaA[i]->raio == comidaB[j]->x)||(comidaA[i]->x - comidaA[i]->raio == comidaB[j]->x))&&
+			((comidaA[i]->y + comidaA[i]->raio == comidaB[j]->y)||(comidaA[i]->y - comidaA[i]->raio == comidaB[j]->y))){
+				
+				comidaA[i]->raio= sqrt((pow(comidaA[i]->raio,2) + pow(comidaB[j]->raio,2)));
+				cria_circulo(comidaB, j);
+		}
+	}else{
+		if(((comidaB[j]->x + comidaB[j]->raio==comidaA[i]->x)||(comidaB[j]->x - comidaB[j]->raio == comidaA[i]->x))&&
+			((comidaB[j]->y + comidaB[j]->raio==comidaA[i]->y)||(comidaB[j]->y - comidaB[j]->raio == comidaA[i]->y))){
+				
+				comidaB[j]->raio= sqrt((pow(comidaA[i]->raio,2)+pow(comidaB[j]->raio,2)));
+				cria_circulo(comidaA, i);
+		}
+	}
+}
+
+//Meu circulo cresce quando passa no raio de outra struct circulo
+void colisao_flash(struct circulo *flash,struct circulo *comidaA,int i,bool *fim){
+	
+	if( flash->raio > comidaA[i]->raio){
+		if(((flash->x + flash->raio == comidaA[i]->x) || (flash->x - flash->raio==comidaA[i]->x))&&
+			((flash->y + flash->raio == comidaA[i]->y) || (flash->y - flash->raio==comidaA[i]->y))){
+				
+				comidaA[i]->raio= sqrt((pow(comidaA[i]->raio,2)+pow(flash->raio,2)));
+				cria_circulo(comidaA, i);
+		}
+	}else{
+		if(((comidaA[i]->x+comidaA[i]->raio==flash->x)||(comidaA[i]->x-comidaA[i]->raio==flash->x))&&
+			((comidaA[i]->y+comidaA[i]->raio==flash->y)||(comidaA[i]->y-comidaA[i]->raio==flashy))){
+				
+				comidaB[j]->raio= sqrt((pow(comidaA[i]->raio,2)+pow(flash->raio,2)));
+				fim=true;
+		}
+	}
+}
+
+//compara a colisao do reverso com a comida
+void colisao_reverso(struct circulo *reverso, struct *comidaA, int i){
+
+	if(reverso->raio > comidaA[i]->raio){
+		if(((reverso->+reverso->raio==comidaA[i]->x)||(reverso->x-reverso->raio==comidaA[i]->x))&&
+			((reverso->y+reverso->raio==comidaA[i]->y)||(reverso->y-reverso->raio==comidaA[i]->y))){
+				
+				comidaA[i]->raio= sqrt((pow(comidaA[i]->raio,2)+pow(reverso->raio,2)));
+				cria_circulo(comidaA, i);
+		}
+	}
+}
+
+//compara a colisao com o fim da tela
+void colisao_tela(struct circulo *qualquer){
+	if((qualquer->x+qualquer->raio==largura) || (qualquer->x-qualquer->raio==0)){
+		qualquer->vx = -qualquer->vx;
+	}
+	if((qualquer->y+qualquer->raio==altura) || qualquer->y-qualquer->raio==0){
+		qualquer->vy = -qualquer->vy;
+	}
+}
+
+//desenha os circulos na tela
+void desenha_circulo(struct circulo b) {
+	al_draw_filled_circle(b.x, b.y, b.raio, b.cor);
+}
+
+void andando(struct circulo *qualquer){
+	qualquer->x += qualquer->vx;
+	qualquer->y += qualquer->vy;
+}
+
+int main(){
+	
+	//cria o ponteiro para o display
+	ALLEGRO_DISPLAY *display = NULL;
+	//cria o ponteiro para fila de eventos
+	ALLEGRO_EVENT_QUEUE *event_queue = NULL;
+	//cria o ponteiro para o tempo
+	ALLEGRO_TIMER *timer = NULL;
+	//coloca jogador como 1
+	int playing = 1;
+	//geração de números aleatórios independentes
+	srand((unsigned)time(NULL));
+	
+//verifica se o alegro iniciou
+	if(!al_init()) {
+		fprintf(stderr, "failed to initialize allegro!\n");
+		return -1;
+	}
+   
+//verifica se a formas primitivas estao funcionando
+	if(!al_init_primitives_addon()){
+		fprintf(stderr, "failed to initialize primitives!\n");
+		return -1;
+    }   
+   
+	//incializa a tela
+	display = al_create_display(SCREEN_W, SCREEN_H);
+   
+//verifica se a tela foi inicializada
+	if(!display) {
+		fprintf(stderr, "failed to create display!\n");
+		return -1;
+	}
+   
+	//inicializa o tempo 
+	timer = al_create_timer(1.0 / FPS);
+   
+	//confere se o tempo foi inicializado 
+	if(!timer) {
+		fprintf(stderr, "failed to create timer!\n");
+		return -1;
+	}
+ 
+	//cria a fila de eventos
+	event_queue = al_create_event_queue();
+   
+	// verifica se a fila de eventos foi inicializada
+	if(!event_queue) {
+		fprintf(stderr, "failed to create event_queue!\n");
+		return -1;
+	}
+   
+	//verifica se o mouse foi instalado e funciona 
+	if(!al_install_mouse()){
+		fprintf(stderr, "failed to initialize mouse!\n");
+	}
+	//registra na fila de eventos que eu quero identificar quando a tela foi alterada
+	al_register_event_source(event_queue, al_get_display_event_source(display));
+	//registra na fila de eventos que eu quero identificar quando o tempo alterou de t para t+1
+	al_register_event_source(event_queue, al_get_timer_event_source(timer));
+	// Registra mouse na fila de eventos:
+	al_register_event_source(event_queue, al_get_mouse_event_source());    
+   
+	ALLEGRO_COLOR BKG_COLOR = al_map_rgb(255,255,255);
+	//avisa o allegro que agora eu quero modificar as propriedades da tela
+	al_set_target_bitmap(al_get_backbuffer(display));
+	//colore a tela de preto (rgb(0,0,0))
+	al_clear_to_color(BKG_COLOR);     
+	//declara o flash
+	struct circulo flash;
+	//chama a função que vai criar ele
+	cria_flash(&flash);
+	//declara o reverso
+	struct circulo reverso;
+	//chama a funcao que vai cria ele
+	cria_reveso(&reverso);
+   
+   
+	struct circulo comida[50];
+	for(int i = 0; i < 50; i++){
+		cria_circulo(comida,i);
+	}
+   
+	ALLEGRO_EVENT ev;
+  
+	//inicia o temporizador
+	al_start_timer(timer);
+	while(playing) {
+	  
+		al_wait_for_event(event_queue, &ev);
+	  
+		if(ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
+			playing = 0;
+		}	  
+		else{
+			if(ev.type == ALLEGRO_EVENT_TIMER) {
+				colisao_tela(&flash);
+				for(int i = 0; i < 50; i++){
+					colisao_tela(&comida[i]);
+				}
+				andando(&flash);
+				andando(&reverso);
+				for(int i = 0; i < 50; i++){
+					andando(&comida[i]);
+				}
+		
+				al_clear_to_color(BKG_COLOR); 
+	   
+				desenha_circulo(flash);
+				desenha_circulo(reverso);
+				for(int i = 0; i < 50; i++){
+					desenha_circulo(comida[i]);
+				}
+	   
+				al_flip_display();
+}
+	
+		//testa se foi apertado o botao para soltar um bola
+		else if(ev.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN) {
+
+			flash.vx += -(ev.mouse.x - flash.x)/dist(ev.mouse.x, flash.x, ev.mouse.y, flash.y);
+			flash.vy += -(ev.mouse.y - flash.y)/dist(ev.mouse.x, flash.x, ev.mouse.y, flash.y);
+		}	
+	}
+	return 0;
+	
+}
